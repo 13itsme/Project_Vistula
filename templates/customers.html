@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Customers{% endblock %}
+{% block content %}
+<h2>Customers</h2>
+<a class="btn-add" href="{{ url_for('add_customer') }}">+ Add Customer</a>
+
+<div class="table-wrapper">
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Email</th></tr></thead>
+<tbody>
+{% for c in customers %}
+<tr><td>{{ c.id }}</td><td>{{ c.name }}</td><td>{{ c.email }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

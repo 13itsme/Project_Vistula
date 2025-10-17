@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Suppliers{% endblock %}
+{% block content %}
+<h2>Suppliers</h2>
+<a class="btn-add" href="{{ url_for('add_supplier') }}">+ Add Supplier</a>
+
+<div class="table-wrapper">
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Phone</th></tr></thead>
+<tbody>
+{% for s in suppliers %}
+<tr><td>{{ s.id }}</td><td>{{ s.name }}</td><td>{{ s.phone }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

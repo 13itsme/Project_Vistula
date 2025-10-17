@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Categories{% endblock %}
+{% block content %}
+<h2>Categories</h2>
+<a class="btn-add" href="{{ url_for('add_category') }}">+ Add Category</a>
+
+<div class="table-wrapper">
+<table>
+<thead><tr><th>ID</th><th>Name</th></tr></thead>
+<tbody>
+{% for c in categories %}
+<tr><td>{{ c.id }}</td><td>{{ c.name }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

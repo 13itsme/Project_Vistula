@@ -2,24 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Product CRUD</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <header>
-        <h1>🛒 Product Management</h1>
-        <nav>
-            <a href="{{ url_for('index') }}">Home</a> |
-            <a href="{{ url_for('add_product') }}">Add Product</a>
-        </nav>
-    </header>
+<header>
+    <h1>Product Management System</h1>
+    <nav>
+        <a href="{{ url_for('index') }}">Products</a>
+        <a href="{{ url_for('suppliers') }}">Suppliers</a>
+        <a href="{{ url_for('categories') }}">Categories</a>
+        <a href="{{ url_for('customers') }}">Customers</a>
+    </nav>
+</header>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer>
-        <p>© 2025 CRUD Project — Flask + HTML + CSS</p>
-    </footer>
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
 </body>
 </html>

@@ -1,55 +1,85 @@
-from flask import Blueprint, request, jsonify
-from app import db
-from models import Product, ProductSchema
+from flask import render_template, request, redirect, url_for
+from app import app, db
+from models import Product, Supplier, Category, Customer
 
-product_bp = Blueprint('product_bp', __name__)
-product_schema = ProductSchema()
-products_schema = ProductSchema(many=True)
+with app.app_context():
+    db.create_all()
 
-# Получить все продукты
-@product_bp.route('/products', methods=['GET'])
-def get_products():
+# PRODUCTS
+@app.route('/')
+def index():
     products = Product.query.all()
-    return products_schema.jsonify(products)
+    return render_template('index.html', products=products)
 
-# Получить продукт по id
-@product_bp.route('/products/<int:id>', methods=['GET'])
-def get_product(id):
-    product = Product.query.get_or_404(id)
-    return product_schema.jsonify(product)
-
-# Добавить продукт
-@product_bp.route('/products', methods=['POST'])
+@app.route('/add_product', methods=['GET', 'POST'])
 def add_product():
-    data = request.get_json()
-    new_product = Product(
-        name=data['name'],
-        category=data['category'],
-        price=data['price'],
-        stock=data['stock']
-    )
-    db.session.add(new_product)
-    db.session.commit()
-    return product_schema.jsonify(new_product), 201
+    suppliers = Supplier.query.all()
+    categories = Category.query.all()
 
-# Обновить продукт
-@product_bp.route('/products/<int:id>', methods=['PUT'])
-def update_product(id):
-    product = Product.query.get_or_404(id)
-    data = request.get_json()
+    if request.method == 'POST':
+        name = request.form.get('name')
+        price = float(request.form.get('price'))
+        supplier_id = request.form.get('supplier_id')
+        category_id = request.form.get('category_id')
 
-    product.name = data.get('name', product.name)
-    product.category = data.get('category', product.category)
-    product.price = data.get('price', product.price)
-    product.stock = data.get('stock', product.stock)
+        new_product = Product(
+            name=name,
+            price=price,
+            supplier_id=supplier_id or None,
+            category_id=category_id or None
+        )
+        db.session.add(new_product)
+        db.session.commit()
+        return redirect(url_for('index'))
 
-    db.session.commit()
-    return product_schema.jsonify(product)
+    return render_template('add_product.html', suppliers=suppliers, categories=categories)
 
-# Удалить продукт
-@product_bp.route('/products/<int:id>', methods=['DELETE'])
-def delete_product(id):
-    product = Product.query.get_or_404(id)
-    db.session.delete(product)
-    db.session.commit()
-    return jsonify({"message": "Product deleted successfully"})
+# SUPPLIERS
+@app.route('/suppliers')
+def suppliers():
+    suppliers = Supplier.query.all()
+    return render_template('suppliers.html', suppliers=suppliers)
+
+@app.route('/add_supplier', methods=['GET', 'POST'])
+def add_supplier():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        new_supplier = Supplier(name=name, phone=phone)
+        db.session.add(new_supplier)
+        db.session.commit()
+        return redirect(url_for('suppliers'))
+    return render_template('add_supplier.html')
+
+# CATEGORIES
+@app.route('/categories')
+def categories():
+    categories = Category.query.all()
+    return render_template('categories.html', categories=categories)
+
+@app.route('/add_category', methods=['GET', 'POST'])
+def add_category():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        new_category = Category(name=name)
+        db.session.add(new_category)
+        db.session.commit()
+        return redirect(url_for('categories'))
+    return render_template('add_category.html')
+
+# CUSTOMERS
+@app.route('/customers')
+def customers():
+    customers = Customer.query.all()
+    return render_template('customers.html', customers=customers)
+
+@app.route('/add_customer', methods=['GET', 'POST'])
+def add_customer():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        new_customer = Customer(name=name, email=email)
+        db.session.add(new_customer)
+        db.session.commit()
+        return redirect(url_for('customers'))
+    return render_template('add_customer.html')
