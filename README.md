@@ -89,3 +89,6 @@ Flask
 SQLAlchemy
 SQLite
 Jinja2
+
+📦 How to download relationships
+pip install -r requirements.txt

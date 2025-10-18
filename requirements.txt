@@ -1,4 +1,16 @@
-flask
-flask-sqlalchemy
-flask-marshmallow
-marshmallow-sqlalchemy
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.36
+Werkzeug==3.0.4
+Jinja2==3.1.4
+itsdangerous==2.2.0
+click==8.1.7
+
+# Для API
+Flask-RESTful==0.3.10
+
+# Для кросс-доступа (на будущее, если API будет внешним)
+Flask-Cors==4.0.1
+
+# Для разработки (перезапуск приложения, дебаг и т.п.)
+python-dotenv==1.0.1
