@@ -1,16 +1,20 @@
-from flask import render_template, request, redirect, url_for
-from app import app, db
+from flask import render_template, request, redirect, url_for #jinja шаблоны, объекты запроса
+from app import app, db # Импорт flask объекта app и базы db
 from models import Product, Supplier, Category, Customer
 
+
+# Создание таблиц в БД если их еще нет при помощи SQLAlchemy
 with app.app_context():
     db.create_all()
 
 # PRODUCTS
+# Главная страница
 @app.route('/')
 def index():
-    products = Product.query.all()
+    products = Product.query.all() # Все строки из таблицы product
     return render_template('index.html', products=products)
 
+# Добавление продуктов
 @app.route('/add_product', methods=['GET', 'POST'])
 def add_product():
     suppliers = Supplier.query.all()
@@ -30,7 +34,7 @@ def add_product():
         )
         db.session.add(new_product)
         db.session.commit()
-        return redirect(url_for('index'))
+        return redirect(url_for('index')) # Возвращает на главную
 
     return render_template('add_product.html', suppliers=suppliers, categories=categories)
 
@@ -40,7 +44,7 @@ def suppliers():
     suppliers = Supplier.query.all()
     return render_template('suppliers.html', suppliers=suppliers)
 
-@app.route('/add_supplier', methods=['GET', 'POST'])
+@app.route('/add_supplier', methods=['GET', 'POST']) # GET страница обновления. POST страница обработки добавления
 def add_supplier():
     if request.method == 'POST':
         name = request.form.get('name')
