@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Products{% endblock %}
+
 {% block content %}
 <h2>Products</h2>
 <a class="btn-add" href="{{ url_for('add_product') }}">+ Add Product</a>
@@ -8,7 +9,13 @@
 <table>
     <thead>
         <tr>
-            <th>ID</th><th>Name</th><th>Price</th><th>Supplier</th><th>Category</th>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Description</th>  
+            <th>Stock</th>        
+            <th>Supplier</th>
+            <th>Category</th>
         </tr>
     </thead>
     <tbody>
@@ -17,6 +24,8 @@
             <td>{{ p.id }}</td>
             <td>{{ p.name }}</td>
             <td>{{ p.price }}</td>
+            <td>{{ p.description or '—' }}</td>  
+            <td>{{ p.stock or 0 }}</td>           
             <td>{{ p.supplier.name if p.supplier else '—' }}</td>
             <td>{{ p.category.name if p.category else '—' }}</td>
         </tr>

@@ -26,3 +26,6 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False)
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'))
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    description = db.Column(db.String(255))
+    stock = db.Column(db.Integer, default=0)
+
