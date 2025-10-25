@@ -25,13 +25,23 @@ def add_product():
         price = float(request.form.get('price'))
         supplier_id = request.form.get('supplier_id')
         category_id = request.form.get('category_id')
+        description = request.form.get('description')
+        stock = request.form.get('stock', 0)
+
+        try:
+            stock = int(stock)
+        except ValueError:
+            stock = 0
 
         new_product = Product(
             name=name,
             price=price,
             supplier_id=supplier_id or None,
-            category_id=category_id or None
+            category_id=category_id or None,
+            description=description,
+            stock=stock
         )
+
         db.session.add(new_product)
         db.session.commit()
         return redirect(url_for('index')) # Возвращает на главную
