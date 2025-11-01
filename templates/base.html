@@ -14,11 +14,182 @@
         <a href="{{ url_for('suppliers') }}">Suppliers</a>
         <a href="{{ url_for('categories') }}">Categories</a>
         <a href="{{ url_for('customers') }}">Customers</a>
+
+        {% if logged_in %}
+            <a href="#" id="logoutBtn" class="btn-register">Logout</a>
+        {% else %}
+            <a href="#" id="loginBtn" class="btn-register">Login</a>
+            <a href="#" id="registerBtn" class="btn-register">Register</a>
+        {% endif %}
     </nav>
 </header>
 
 <main class="container">
     {% block content %}{% endblock %}
 </main>
+
+<!-- === Модальное окно LOGIN === -->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="text" id="loginUsername" placeholder="Username" required>
+      <input type="password" id="loginPassword" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+  </div>
+</div>
+
+<!-- === Модальное окно REGISTER === -->
+<div id="registerModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Register</h2>
+    <form id="registerForm">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Sign Up</button>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const loginModal = document.getElementById("loginModal");
+    const registerModal = document.getElementById("registerModal");
+    const loginBtn = document.getElementById("loginBtn");
+    const registerBtn = document.getElementById("registerBtn");
+    const closeBtns = document.querySelectorAll(".close");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    // === Открытие / закрытие модалок ===
+    if (loginBtn) {
+        loginBtn.addEventListener("click", e => {
+            e.preventDefault();
+            loginModal.classList.add("show");
+        });
+    }
+
+    if (registerBtn) {
+        registerBtn.addEventListener("click", e => {
+            e.preventDefault();
+            registerModal.classList.add("show");
+        });
+    }
+
+    closeBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            loginModal.classList.remove("show");
+            registerModal.classList.remove("show");
+        });
+    });
+
+    window.addEventListener("click", e => {
+        if (e.target === loginModal) loginModal.classList.remove("show");
+        if (e.target === registerModal) registerModal.classList.remove("show");
+    });
+
+    // === Login ===
+    const loginForm = document.getElementById("loginForm");
+    if (loginForm) {
+        loginForm.addEventListener("submit", async e => {
+            e.preventDefault();
+            const data = {
+                username: document.getElementById("loginUsername").value,
+                password: document.getElementById("loginPassword").value
+            };
+
+            const res = await fetch("/api/login", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                loginModal.classList.remove("show");
+                location.reload();
+            } else {
+                const err = await res.json();
+                alert(err.error || "Invalid credentials");
+            }
+        });
+    }
+
+    // === Register ===
+    const registerForm = document.getElementById("registerForm");
+    if (registerForm) {
+        registerForm.addEventListener("submit", async e => {
+            e.preventDefault();
+            const data = {
+                username: document.getElementById("username").value,
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value
+            };
+            const res = await fetch("/api/register", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            });
+            if (res.ok) {
+                registerModal.classList.remove("show");
+                location.reload();
+            } else {
+                const err = await res.json();
+                alert(err.error || "Registration failed");
+            }
+        });
+    }
+
+    // === Logout ===
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", async () => {
+            await fetch("/api/logout", {method: "POST"});
+            location.reload();
+        });
+    }
+});
+</script>
+
+<style>
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.modal.show {
+    display: flex;
+}
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+}
+.modal-content input {
+    width: 100%;
+    margin: 5px 0;
+    padding: 8px;
+}
+.modal-content button {
+    background: #6a1b9a;
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.close {
+    float: right;
+    font-size: 18px;
+    cursor: pointer;
+}
+</style>
 </body>
 </html>

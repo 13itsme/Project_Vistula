@@ -1,17 +1,40 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block title %}Customers{% endblock %}
-{% block content %}
-<h2>Customers</h2>
-<a class="btn-add" href="{{ url_for('add_customer') }}">+ Add Customer</a>
 
-<div class="table-wrapper">
-<table>
-<thead><tr><th>ID</th><th>Name</th><th>Email</th></tr></thead>
-<tbody>
-{% for c in customers %}
-<tr><td>{{ c.id }}</td><td>{{ c.name }}</td><td>{{ c.email }}</td></tr>
-{% endfor %}
-</tbody>
-</table>
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2>Customers</h2>
+    <a href="{{ url_for('add_customer') }}" class="btn-add">+ Add Customer</a>
+  </div>
+
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for customer in customers %}
+      <tr>
+        <td>{{ customer.id }}</td>
+        <td>{{ customer.name }}</td>
+        <td>{{ customer.email or '' }}</td>
+        <td><a href="{{ url_for('edit_item', model='customer', item_id=customer.id) }}" class="btn-edit">Edit</a></td>
+        <td>
+          <form method="POST" action="{{ url_for('delete_item', model='customer', item_id=customer.id) }}" onsubmit="return confirm('Delete this customer?');">
+            <button type="submit" class="btn-delete">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" style="text-align:center;">No customers found</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

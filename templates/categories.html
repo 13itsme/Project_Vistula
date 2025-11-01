@@ -1,17 +1,38 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block title %}Categories{% endblock %}
-{% block content %}
-<h2>Categories</h2>
-<a class="btn-add" href="{{ url_for('add_category') }}">+ Add Category</a>
 
-<div class="table-wrapper">
-<table>
-<thead><tr><th>ID</th><th>Name</th></tr></thead>
-<tbody>
-{% for c in categories %}
-<tr><td>{{ c.id }}</td><td>{{ c.name }}</td></tr>
-{% endfor %}
-</tbody>
-</table>
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2>Categories</h2>
+    <a href="{{ url_for('add_category') }}" class="btn-add">+ Add Category</a>
+  </div>
+
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for category in categories %}
+      <tr>
+        <td>{{ category.id }}</td>
+        <td>{{ category.name }}</td>
+        <td><a href="{{ url_for('edit_item', model='category', item_id=category.id) }}" class="btn-edit">Edit</a></td>
+        <td>
+          <form method="POST" action="{{ url_for('delete_item', model='category', item_id=category.id) }}" onsubmit="return confirm('Delete this category?');">
+            <button type="submit" class="btn-delete">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" style="text-align:center;">No categories found</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

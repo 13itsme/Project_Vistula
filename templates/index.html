@@ -1,36 +1,46 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block title %}Products{% endblock %}
 
 {% block content %}
-<h2>Products</h2>
-<a class="btn-add" href="{{ url_for('add_product') }}">+ Add Product</a>
+<div class="card">
+  <div class="card-header">
+    <h2>Products</h2>
+    <a href="{{ url_for('add_product') }}" class="btn-add">+ Add Product</a>
+  </div>
 
-<div class="table-wrapper">
-<table>
+  <table class="styled-table">
     <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Description</th>  
-            <th>Stock</th>        
-            <th>Supplier</th>
-            <th>Category</th>
-        </tr>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Description</th>
+        <th>Stock</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
     </thead>
     <tbody>
-        {% for p in products %}
-        <tr>
-            <td>{{ p.id }}</td>
-            <td>{{ p.name }}</td>
-            <td>{{ p.price }}</td>
-            <td>{{ p.description or '—' }}</td>  
-            <td>{{ p.stock or 0 }}</td>           
-            <td>{{ p.supplier.name if p.supplier else '—' }}</td>
-            <td>{{ p.category.name if p.category else '—' }}</td>
-        </tr>
-        {% endfor %}
+      {% for product in products %}
+      <tr>
+        <td>{{ product.id }}</td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.price }} PLN</td>
+        <td>{{ product.description or '' }}</td>
+        <td>{{ product.stock }}</td>
+        <td>
+          <a href="{{ url_for('edit_item', model='product', item_id=product.id) }}" class="btn-edit">Edit</a>
+        </td>
+        <td>
+          <form method="POST" action="{{ url_for('delete_item', model='product', item_id=product.id) }}" onsubmit="return confirm('Delete this product?');">
+            <button type="submit" class="btn-delete">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" style="text-align:center;">No products found</td></tr>
+      {% endfor %}
     </tbody>
-</table>
+  </table>
 </div>
 {% endblock %}

@@ -1,17 +1,40 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block title %}Suppliers{% endblock %}
-{% block content %}
-<h2>Suppliers</h2>
-<a class="btn-add" href="{{ url_for('add_supplier') }}">+ Add Supplier</a>
 
-<div class="table-wrapper">
-<table>
-<thead><tr><th>ID</th><th>Name</th><th>Phone</th></tr></thead>
-<tbody>
-{% for s in suppliers %}
-<tr><td>{{ s.id }}</td><td>{{ s.name }}</td><td>{{ s.phone }}</td></tr>
-{% endfor %}
-</tbody>
-</table>
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2>Suppliers</h2>
+    <a href="{{ url_for('add_supplier') }}" class="btn-add">+ Add Supplier</a>
+  </div>
+
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for supplier in suppliers %}
+      <tr>
+        <td>{{ supplier.id }}</td>
+        <td>{{ supplier.name }}</td>
+        <td>{{ supplier.phone or '' }}</td>
+        <td><a href="{{ url_for('edit_item', model='supplier', item_id=supplier.id) }}" class="btn-edit">Edit</a></td>
+        <td>
+          <form method="POST" action="{{ url_for('delete_item', model='supplier', item_id=supplier.id) }}" onsubmit="return confirm('Delete this supplier?');">
+            <button type="submit" class="btn-delete">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" style="text-align:center;">No suppliers found</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}

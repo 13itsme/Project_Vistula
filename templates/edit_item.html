@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ model|capitalize }}{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Edit {{ model|capitalize }}</h2>
+
+  <form method="POST">
+    {% if model == 'product' %}
+      <label>Name:</label>
+      <input type="text" name="name" value="{{ item.name }}" required>
+
+      <label>Price:</label>
+      <input type="number" step="0.01" name="price" value="{{ item.price }}" required>
+
+      <label>Description:</label>
+      <input type="text" name="description" value="{{ item.description or '' }}">
+
+      <label>Stock:</label>
+      <input type="number" name="stock" value="{{ item.stock or 0 }}">
+
+    {% elif model == 'supplier' %}
+      <label>Name:</label>
+      <input type="text" name="name" value="{{ item.name }}" required>
+
+      <label>Phone:</label>
+      <input type="text" name="phone" value="{{ item.phone or '' }}">
+
+    {% elif model == 'category' %}
+      <label>Name:</label>
+      <input type="text" name="name" value="{{ item.name }}" required>
+
+    {% elif model == 'customer' %}
+      <label>Name:</label>
+      <input type="text" name="name" value="{{ item.name }}" required>
+
+      <label>Email:</label>
+      <input type="email" name="email" value="{{ item.email or '' }}">
+    {% endif %}
+
+    <div style="margin-top: 20px;">
+      <button type="submit" class="btn-add">💾 Save</button>
+      <a href="{{ url_for(return_page) }}" class="btn-cancel">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
