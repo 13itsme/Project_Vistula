@@ -4,54 +4,71 @@ from models import Product, Supplier, Category, Customer, User
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-# === Контекстный процессор ===
+# Контекстный процессор - автодобавление logged_in в каждый шаблон
 @app.context_processor
 def inject_user_status():
     return {'logged_in': 'user_id' in session}
 
 
-# === Главная страница (Products) ===
+# Главная страница (Products)
 @app.route('/')
 def index():
     products = Product.query.all()
     return render_template('index.html', products=products)
 
 
-# === Поставщики ===
+# Поставщики
 @app.route('/suppliers')
 def suppliers():
     suppliers = Supplier.query.all()
     return render_template('suppliers.html', suppliers=suppliers)
 
 
-# === Категории ===
+# Категории
 @app.route('/categories')
 def categories():
     categories = Category.query.all()
     return render_template('categories.html', categories=categories)
 
 
-# === Клиенты ===
+# Клиенты
 @app.route('/customers')
 def customers():
     customers = Customer.query.all()
     return render_template('customers.html', customers=customers)
 
 
-# === Добавление продукта ===
+# Добавление продукта
 @app.route('/add_product', methods=['GET', 'POST'])
 def add_product():
     if request.method == 'POST':
         name = request.form['name']
         price = float(request.form['price'])
-        new_product = Product(name=name, price=price)
+        description = request.form.get('description', '')
+        stock = int(request.form.get('stock', 0))
+        supplier_id = request.form.get('supplier_id')
+        category_id = request.form.get('category_id')
+
+        new_product = Product(
+            name=name,
+            price=price,
+            description=description,
+            stock=stock,
+            supplier_id=supplier_id if supplier_id else None,
+            category_id=category_id if category_id else None
+        )
+
         db.session.add(new_product)
         db.session.commit()
         return redirect(url_for('index'))
-    return render_template('add_product.html')
+
+    suppliers = Supplier.query.all()
+    categories = Category.query.all()
+    return render_template('add_product.html', suppliers=suppliers, categories=categories)
 
 
-# === Добавление поставщика ===
+
+# Добавление поставщика
 @app.route('/add_supplier', methods=['GET', 'POST'])
 def add_supplier():
     if request.method == 'POST':
@@ -64,7 +81,7 @@ def add_supplier():
     return render_template('add_supplier.html')
 
 
-# === Добавление категории ===
+# Добавление категории
 @app.route('/add_category', methods=['GET', 'POST'])
 def add_category():
     if request.method == 'POST':
@@ -76,7 +93,7 @@ def add_category():
     return render_template('add_category.html')
 
 
-# === Добавление клиента ===
+# Добавление клиента
 @app.route('/add_customer', methods=['GET', 'POST'])
 def add_customer():
     if request.method == 'POST':
@@ -89,7 +106,7 @@ def add_customer():
     return render_template('add_customer.html')
 
 
-# === Универсальное редактирование ===
+# Универсальное редактирование
 @app.route('/edit/<model>/<int:item_id>', methods=['GET', 'POST'])
 def edit_item(model, item_id):
     model_map = {
@@ -105,22 +122,37 @@ def edit_item(model, item_id):
 
     item = Model.query.get_or_404(item_id)
 
+    # Обработка формы (POST)
     if request.method == 'POST':
         for key, value in request.form.items():
             if hasattr(item, key):
                 setattr(item, key, value)
         db.session.commit()
+
+        # После сохранения возвращаемся на нужную страницу
         if model == 'product':
             return redirect(url_for('index'))
         else:
             return redirect(url_for(f"{model}s"))
 
-    # === Исправление return_page ===
-    return_page = 'index' if model == 'product' else f"{model}s"
-    return render_template('edit_item.html', item=item, model=model, return_page=return_page)
+    # Карта возвратов для кнопки Cancel
+    plural_map = {
+        'product': None,
+        'supplier': 'suppliers',
+        'category': 'categories',
+        'customer': 'customers'
+    }
+    return_page = plural_map.get(model)
+
+    return render_template(
+        'edit_item.html',
+        item=item,
+        model=model,
+        return_page=return_page
+    )
 
 
-# === Удаление ===
+# Удаление
 @app.route('/delete/<model>/<int:item_id>', methods=['POST'])
 def delete_item(model, item_id):
     model_map = {
@@ -144,7 +176,7 @@ def delete_item(model, item_id):
         return redirect(url_for(f"{model}s"))
 
 
-# === Регистрация ===
+# Регистрация
 @app.route('/register', methods=['POST'])
 def register():
     username = request.form['username']
@@ -161,7 +193,7 @@ def register():
     return jsonify({'message': 'Registered successfully'}), 200
 
 
-# === Логин ===
+# Логин
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
@@ -174,7 +206,7 @@ def login():
     return jsonify({'message': 'Invalid credentials'}), 401
 
 
-# === Логаут ===
+# Логаут
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
